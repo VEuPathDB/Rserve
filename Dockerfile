@@ -26,6 +26,6 @@ RUN chmod 755 ${RSERVE_HOME}/bin/run_rserve.sh
 
 RUN mkdir ${RSERVE_HOME}/work
 
-EXPOSE 8080
+EXPOSE 6311
 
 CMD ["/opt/rserve/bin/run_rserve.sh"]
