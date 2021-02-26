@@ -11,7 +11,7 @@ RUN R -e "install.packages('Rserve', version='1.8-7', repos='http://rforge.net')
 RUN R -e "install.packages('data.table', version='1.13.6')"
 RUN R -e "install.packages('jsonlite', version='1.7.3')"
 RUN R -e "install.packages('remotes', version='2.2.0')"
-RUN R -e "remotes::install_github('VEuPathDB/plot.data')"
+RUN R -e "remotes::install_github('VEuPathDB/plot.data','v0.1.0')"
 
 
 ## Rserve
