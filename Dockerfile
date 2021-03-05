@@ -27,4 +27,4 @@ RUN mkdir ${RSERVE_HOME}/work
 
 EXPOSE 6311
 
-RUN R -e "Rserve::Rserve(debug=FALSE, args=\"--vanilla\")"
+CMD R -e "Rserve::Rserve(args=\"--vanilla\")"

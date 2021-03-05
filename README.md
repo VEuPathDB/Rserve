@@ -4,4 +4,4 @@ docker build -t rserve Rserve/ --no-cache
 
 **How to run:**
 
-docker run -it --rm rserve:latest
+docker run --rm rserve:latest
