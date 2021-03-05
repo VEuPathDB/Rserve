@@ -19,13 +19,12 @@ RUN mkdir -p /opt/rserve
 ENV RSERVE_HOME /opt/rserve
 
 COPY etc/Rserv.conf /etc/Rserv.conf
-COPY run_rserve.sh ${RSERVE_HOME}/bin/
 RUN mkdir ${RSERVE_HOME}/lib
 COPY lib/functions.R ${RSERVE_HOME}/lib
-RUN chmod 755 ${RSERVE_HOME}/bin/run_rserve.sh
+COPY lib/preload.R ${RSERVE_HOME}/lib
 
 RUN mkdir ${RSERVE_HOME}/work
 
 EXPOSE 6311
 
-CMD ["/opt/rserve/bin/run_rserve.sh"]
+RUN R -e "Rserve::Rserve(debug=FALSE, args=\"--vanilla\")"
