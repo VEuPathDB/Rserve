@@ -12,7 +12,7 @@ RUN R -e "install.packages('data.table')"
 RUN R -e "install.packages('bit64')"
 RUN R -e "install.packages('jsonlite')"
 RUN R -e "install.packages('remotes')"
-RUN R -e "remotes::install_github('VEuPathDB/plot.data','v0.5.4')"
+RUN R -e "remotes::install_github('VEuPathDB/plot.data','v0.5.5')"
 
 
 ## Rserve
