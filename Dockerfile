@@ -9,10 +9,22 @@ RUN useradd rserve \
 ## install libs
 RUN R -e "install.packages('Rserve', version='1.8-7', repos='http://rforge.net')"
 RUN R -e "install.packages('data.table')"
+RUN R -e "install.packages('ape')"
+RUN R -e "install.packages('vegan')"
+RUN R -e "install.packages('phytools')"
+RUN R -e "install.packages('rbiom')"
 RUN R -e "install.packages('bit64')"
 RUN R -e "install.packages('jsonlite')"
 RUN R -e "install.packages('remotes')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v0.5.5')"
+
+
+RUN apt-get update && apt-get install -y \
+	libglpk-dev \
+	libxml2-dev
+
+RUN R -e "install.packages('BiocManager')"
+RUN R -e "BiocManager::install('DESeq2')"
 
 
 ## Rserve

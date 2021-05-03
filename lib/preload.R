@@ -1,3 +1,8 @@
 library(plot.data)
 library(data.table)
+library(ape)
+library(vegan)
+library(phytools)
+library(rbiom)
+library(DESeq2)
 source('/opt/rserve/lib/functions.R')
