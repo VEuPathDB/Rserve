@@ -16,7 +16,7 @@ RUN R -e "install.packages('rbiom')"
 RUN R -e "install.packages('bit64')"
 RUN R -e "install.packages('jsonlite')"
 RUN R -e "install.packages('remotes')"
-RUN R -e "remotes::install_github('VEuPathDB/plot.data','v0.5.5')"
+RUN R -e "remotes::install_github('VEuPathDB/plot.data','v0.5.6')"
 
 
 RUN apt-get update && apt-get install -y \
