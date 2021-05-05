@@ -16,8 +16,6 @@ RUN R -e "install.packages('rbiom')"
 RUN R -e "install.packages('bit64')"
 RUN R -e "install.packages('jsonlite')"
 RUN R -e "install.packages('remotes')"
-RUN R -e "remotes::install_github('VEuPathDB/plot.data','v0.5.6')"
-
 
 RUN apt-get update && apt-get install -y \
 	libglpk-dev \
@@ -26,6 +24,7 @@ RUN apt-get update && apt-get install -y \
 RUN R -e "install.packages('BiocManager')"
 RUN R -e "BiocManager::install('DESeq2')"
 
+RUN R -e "remotes::install_github('VEuPathDB/plot.data','v0.5.6')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
