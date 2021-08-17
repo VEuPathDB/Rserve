@@ -6,4 +6,5 @@ library(rbiom)
 library(DESeq2)
 ## NOTE: attach our in house packages last
 library(plot.data)
-source('/opt/rserve/lib/functions.R')
+files.sources <- list.files('opt/rserve/lib/R/', full.names=TRUE, recursive=TRUE)
+invisible(sapply(files.sources, source))

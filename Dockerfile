@@ -37,8 +37,7 @@ ENV RSERVE_HOME /opt/rserve
 
 COPY etc/Rserv.conf /etc/Rserv.conf
 RUN mkdir ${RSERVE_HOME}/lib
-COPY lib/functions.R ${RSERVE_HOME}/lib
-COPY lib/preload.R ${RSERVE_HOME}/lib
+COPY lib/* ${RSERVE_HOME}/lib/
 
 RUN mkdir ${RSERVE_HOME}/work
 
