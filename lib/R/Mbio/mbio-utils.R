@@ -9,6 +9,7 @@
 ## Naming conventions?
 
 ## Make default tree when none supplied
+## NOT phase 1
 makeDefaultTree <- function(taxonomy_df) {
   
     #### Eventually needs to be only the actual var details
@@ -29,4 +30,19 @@ makeDefaultTree <- function(taxonomy_df) {
     tree <- phytools::force.ultrametric(tree, method="extend")
 
     return(tree)
+}
+
+#### Add reshapeByLevel or similar that takes df, taxonomic level, and returns df
+reshapeBySelectedLevel <- function(df, taxonomicLevel) {
+    # Clean data - rename, fill Nas with 0
+    data.table::setnames(df, c("Sample ID", "Relative Abundance", "Absolute Abundance"), c("SampleID", "RelativeAbundance", "AbosluteAbundance"))
+    data.table::setnames(df, 'Kingdom/SuperKingdom', 'Kingdom')
+    setnafill(df, fill = 0, cols = c("RelativeAbundance"))
+
+    # Aggregate by taxonomic level
+    byCols <- c(taxonomicLevel, 'SampleID')
+    dfFiltered <- df[, .("Abundance" = sum(RelativeAbundance)), by = eval(byCols)]
+    #### Replace column N/A with unknown
+
+    return(dfFiltered)
 }
