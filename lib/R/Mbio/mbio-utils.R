@@ -34,7 +34,9 @@ makeDefaultTree <- function(taxonomy_df) {
 
 #### Add reshapeByLevel or similar that takes df, taxonomic level, and returns df
 reshapeBySelectedLevel <- function(df, taxonomicLevel) {
+
     # Clean data - rename, fill Nas with 0
+    #### Maybe this part should be a separate function?
     data.table::setnames(df, c("Sample ID", "Relative Abundance", "Absolute Abundance"), c("SampleID", "RelativeAbundance", "AbosluteAbundance"))
     data.table::setnames(df, 'Kingdom/SuperKingdom', 'Kingdom')
     setnafill(df, fill = 0, cols = c("RelativeAbundance"))
@@ -42,6 +44,7 @@ reshapeBySelectedLevel <- function(df, taxonomicLevel) {
     # Aggregate by taxonomic level
     byCols <- c(taxonomicLevel, 'SampleID')
     dfFiltered <- df[, .("Abundance" = sum(RelativeAbundance)), by = eval(byCols)]
+    
     #### Replace column N/A with unknown
 
     return(dfFiltered)
