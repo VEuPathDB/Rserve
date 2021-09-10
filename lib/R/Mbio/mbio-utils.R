@@ -32,20 +32,26 @@ makeDefaultTree <- function(taxonomy_df) {
     return(tree)
 }
 
-#### Add reshapeByLevel or similar that takes df, taxonomic level, and returns df
-reshapeBySelectedLevel <- function(df, taxonomicLevel) {
+## From the input taxon abundance data frame, create an otu (samples x taxa) table.
+makeOTU <- function(df, taxonomicLevel) {
 
     # Clean data - rename, fill Nas with 0
     #### Maybe this part should be a separate function?
-    data.table::setnames(df, c("Sample ID", "Relative Abundance", "Absolute Abundance"), c("SampleID", "RelativeAbundance", "AbosluteAbundance"))
-    data.table::setnames(df, 'Kingdom/SuperKingdom', 'Kingdom')
+    data.table::setnames(df, c("Sample ID", "Relative Abundance", "Absolute Abundance", "Kingdom/SuperKingdom"), c("SampleID", "RelativeAbundance", "AbosluteAbundance", "Kingdom"), skip_absent = T)
     setnafill(df, fill = 0, cols = c("RelativeAbundance"))
 
     # Aggregate by taxonomic level
     byCols <- c(taxonomicLevel, 'SampleID')
-    dfFiltered <- df[, .("Abundance" = sum(RelativeAbundance)), by = eval(byCols)]
+    df <- df[, .("Abundance" = sum(RelativeAbundance)), by = eval(byCols)]
     
     #### Replace column N/A with unknown
 
-    return(dfFiltered)
+    # Reshape to OTU (samples x taxa)
+    otu <- data.table::dcast(df, as.formula(paste0("SampleID~", taxonomicLevel)), fun.aggregate = sum, value.var = 'Abundance')
+
+    # Replace NAs with 0
+    # setnafill(df, fill = 0, cols = -c("SampleID"))
+
+
+    return(df)
 }
