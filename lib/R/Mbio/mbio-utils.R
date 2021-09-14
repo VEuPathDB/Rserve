@@ -1,5 +1,6 @@
 ## Microbiome-specific helpers
 
+print("Loading mbio utils functions...")
 
 ## Currently just placeholders and room to brainstorm
 ## Parse tree from file into something helpful
@@ -32,26 +33,64 @@ makeDefaultTree <- function(taxonomy_df) {
     return(tree)
 }
 
-## From the input taxon abundance data frame, create an otu (samples x taxa) table.
-makeOTU <- function(df, taxonomicLevel) {
 
-    # Clean data - rename, fill Nas with 0
-    #### Maybe this part should be a separate function?
-    data.table::setnames(df, c("Sample ID", "Relative Abundance", "Absolute Abundance", "Kingdom/SuperKingdom"), c("SampleID", "RelativeAbundance", "AbosluteAbundance", "Kingdom"), skip_absent = T)
-    setnafill(df, fill = 0, cols = c("RelativeAbundance"))
-
-    # Aggregate by taxonomic level
-    byCols <- c(taxonomicLevel, 'SampleID')
-    df <- df[, .("Abundance" = sum(RelativeAbundance)), by = eval(byCols)]
+rankTaxa <- function(df, method, cutoff, taxonomicLevel) {
     
-    #### Replace column N/A with unknown
+    ## Rank by method
+    if (identical(method, 'median')) {
+        ranked <- df[, list(Abundance=median(Abundance)), by=taxonomicLevel]
+    } else if (identical(method, 'max')) {
+        ranked <- df[, list(Abundance=max(Abundance)), by=taxonomicLevel]
+    } else if (identical(method, 'q3')) {
+        ranked <- df[, list(Abundance=quantile(Abundance, 0.75)), by=taxonomicLevel]
+    } else if (identical(method, 'var')) {
+        ranked <- df[, list(Abundance=var(Abundance)), by=taxonomicLevel]
+    } else {
+        stop("Unsupported ranking method.")
+    }
+
+    setorderv(ranked, c("Abundance", taxonomicLevel), c(-1, 1))
+
+    # Extract top N taxa
+    topN <- ranked[Abundance > 0, ..taxonomicLevel]
+    if (NROW(topN) > cutoff) {
+        topN <- topN[1:cutoff]
+    }
+
+    return(topN)
+}
+
+makeOTU <- function(df, taxonomicLevel) {
 
     # Reshape to OTU (samples x taxa)
     otu <- data.table::dcast(df, as.formula(paste0("SampleID~", taxonomicLevel)), fun.aggregate = sum, value.var = 'Abundance')
 
-    # Replace NAs with 0
-    # setnafill(df, fill = 0, cols = -c("SampleID"))
 
+    #### Replace NAs with 0
+    data.table::setnafill(df, fill = 0, cols = "Abundance")
 
-    return(df)
+    ## Some sort of name check?
+
+    return(otu)
 }
+
+formatTaxaDT <- function(df) {
+
+    data.table::setDT(df)
+
+    # Clean data - rename, fill Nas with 0
+    #### Maybe this part should be a separate function of cleaning data?
+    data.table::setnames(df, c("Sample ID", "Relative Abundance", "Absolute Abundance", "Kingdom/SuperKingdom"), c("SampleID", "RelativeAbundance", "AbosluteAbundance", "Kingdom"), skip_absent = T)
+    # setnafill(df, fill = 0, cols = c("RelativeAbundance"))
+
+    #### Replace column N/A with unknown taxonLevel -1
+    ## Note setnafill does not handle chars
+
+    # Aggregate by taxonomic level
+    byCols <- c(taxonomicLevel, 'SampleID')
+    df <- df[, .("Abundance" = sum(RelativeAbundance)), by = eval(byCols)]
+
+    return (df)
+}
+
+print("Done loading microbiome utils functions!")
