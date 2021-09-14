@@ -1,45 +1,49 @@
-# ## Alpha div
-# # Assumes data read into variable called 'df'
+#   ## Inputs
+#   taxonomicLevel <- 'Class'
+#   verbose <- TRUE
 
-# taxonomicLevel <- 'Class'
+#   computeMessage <- ''
 
-# ##### Add data checks (everything numeric, others?)
-# # validate numeric
-# # validate df is data.frame
-# data.table::setDT(df)
+#   # Create OTU
+#   otu <- makeOTU(df, taxonomicLevel)
+#   plot.data::logWithTime(paste("Created OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
+  
 
-# #### Also need to clean data (handle unknown taxa). Maybe separate function?
-# otu <- makeOTU(df, taxonomicLevel)
+#   ## Actual alpha div calculations
+#   # Assume taxa are cols always
+#   shannon <- try(vegan::diversity(otu[, -c('SampleID')], 'shannon'))
+#   simpson <- try(vegan::diversity(otu[, -c('SampleID')], 'simpson'))
+#   evenness <- try(shannon / log(vegan::specnumber(otu)))
 
-# ## Actual alpha div calculations
-# # Assume taxa are cols always
+#   if (any(is.error(c(shannon, simpson, evenness)))) {
+#     computeMessage <- "Error, alpha diversity calculations failed"
+#     # Also handle dt, outJSON?
+#   } else {
+#     computeMessage <- "Computed shannon, simpson, evenness alpha diversity measures."
+#     plot.data::logWithTime("Finished computing alpha diversity measures.", verbose)
+#   }
 
-# # Compute message can hold errors or extra info about the computation (convergence time, replace NA info, etc.)
-# computeMessage <- ''
-
-
-# # Compute alpha diversity and evenness
-# # try(
-# shannon <- vegan::diversity(otu[, -c('SampleID')], 'shannon')
-# simpson <- vegan::diversity(otu[, -c('SampleID')], 'simpson')
-# evenness <- shannon / log(vegan::specnumber(otu))
-# # )
-# # if error, computeMessage <- error else, computeMessage <- 'computed shannon, simpson, evenness'
-
-# # Assemble data table
-# dt <- data.table('SampleID'= otu[['SampleID']],
-#                 'shannon' = shannon,
-#                 'simpson' = simpson,
-#                 'evennness' = evenness)
+#   # Assemble data table
+#   dt <- data.table('SampleID'= otu[['SampleID']],
+#                    'shannon' = shannon,
+#                    'simpson' = simpson,
+#                    'evennness' = evenness)
 
 
-# # writeDT(dt, 'alphadiv')
+#   # writeDT(dt, 'alphadiv', verbose)
 
-# # Write json metadata -- should be preconfigured above in case of error.
-# jsonList <- list(
-# 'computedVariable'= names(dt[, -c('SampleID')]),
-# 'computedVariableLabels'= c('Shannon', 'Simpson', 'Pielou\'s evenness'),
-# 'yAxisLabel' = 'Alpha Diversity',
-# 'defaultRange' = c(0, 1),
-# 'computeDetails' = computeMessage
-# )
+#   # Write json metadata
+#   jsonList <- list(
+#     'computedVariable'= names(dt[, -c('SampleID')]),
+#     'computedVariableLabels'= c('Shannon', 'Simpson', 'Pielou\'s evenness'),
+#     'yAxisLabel' = jsonlite::unbox('Alpha Diversity'),
+#     'defaultRange' = c(0, 1),
+#     'computeDetails' = jsonlite::unbox(computeMessage)
+#   )
+
+#   # writeMetadata(jsonList, 'alphadiv', verbose)
+
+#   print(head(dt))
+#   print(jsonList)
+
+#   plot.data::logWithTime("Completed alpha diversity app.", verbose)
