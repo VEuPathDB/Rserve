@@ -1,50 +1,64 @@
-#   # Inputs
-#   ranking_method <- 'Median'
-#   taxonomicLevel <- 'Class'
-#   verbose <- T
+#### Docs TODO
+#### Rank abundance data
+rankedAbundance <- function(otu, verbose = c(TRUE, FALSE)) {
 
-#   computeMessage <- ''
+  # Initialize and check inputs
+  verbose <- plot.data::matchArg(verbose)
 
-  # plot.data::logWithTime(paste("Read OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
+  computeMessage <- ''
+  plot.data::logWithTime(paste("Received OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
 
-#   # Reshape back to sample, taxonomicLevel, abundance
-#   formattedDT <- data.table::melt(otu, measure.vars=colnames(otu)[-1], variable.factor=F, variable.name=taxonomicLevel, value.name="Abundance")
+  # Reshape back to sample, taxonomicLevel, abundance
+  formattedDT <- data.table::melt(otu, measure.vars=colnames(otu)[-1], variable.factor=F, variable.name=taxonomicLevel, value.name="Abundance")
 
-#   # Rank by method
-#   rankingMethods <- c('median','max','q3','var')
-#   rankedTaxaList <- lapply(rankingMethods, topNTaxa, df=formattedDT, cutoff=10, taxonomicLevel = taxonomicLevel)
+  # Rank by method
+  rankingMethods <- c('median','max','q3','var')
+  rankedTaxaList <- lapply(rankingMethods, topNTaxa, df=formattedDT, cutoff=10, taxonomicLevel = taxonomicLevel)
 
-#   # Admittedly terrible. Functions but needs clenaing up. Struggled to find a nice data.table solution
-#   dtList <- lapply(seq_along(rankedTaxaList), function(x) {cols <- c("SampleID", rankedTaxaList[[x]][[taxonomicLevel]]); otui <- otu[, ..cols];
-#                                               data.table::setnames(otui, colnames(otui)[-1], paste0(colnames(otui)[-1], "_", rankingMethods[x]))
-#                                               return(otui)})
+  # Admittedly terrible. Functions but needs clenaing up. Struggled to find a nice data.table solution
+  dtList <- lapply(seq_along(rankedTaxaList), function(x) {cols <- c("SampleID", rankedTaxaList[[x]][[taxonomicLevel]]); otui <- otu[, ..cols];
+                                              data.table::setnames(otui, colnames(otui)[-1], paste0(colnames(otui)[-1], "_", rankingMethods[x]))
+                                              return(otui)})
 
-#   plot.data::logWithTime("Finished ranking taxa", verbose)
+  plot.data::logWithTime("Finished ranking taxa", verbose)
 
-#   # Merge into one large dt
-#   dt <- Reduce(function(...) merge(..., all = TRUE, by='SampleID'), dtList)
+  # Merge into one large dt
+  dt <- Reduce(function(...) merge(..., all = TRUE, by='SampleID'), dtList)
 
+  # Write results
+  results <- list(
+    'dt' = dt,
+    'computeDetails' = computeMessage,
+    'rankedTaxaList' = rankedTaxaList
+  )
 
-#   # Write dt
-#   # writeDT(dt, "abundance", verbose)
+  return (results)
+}
 
-#   # Write json metadata
-#   jsonList <- list(
-#     'computedVariable'= names(dt[, -c('SampleID')]),
-#     'computedVariableLabels'= unname(unlist(rankedTaxaList)),
-#     'yAxisLabel' = jsonlite::unbox('Relative Abundance'),
-#     'defaultRange' = c(0, 1),
-#     'computeDetails' = jsonlite::unbox(computeMessage),
-#     'xAxisLabel' = jsonlite::unbox(taxonomicLevel),
-#     'plotTitle' = jsonlite::unbox("Top taxa with computed value > 0")
-#   )
-#   # It would be helpful to revisit the title. Does it have to have the complicated logic? Can we be more clever? 
-#   # Logic in the front end could just be about if there are fewer than 10 returned and the ranking method selected?
-#   # So then for median, the two title options would be "Top 10 taxa ranked by median" (n>=10) and "Top taxa ranked by median (taxa with median=0 not shown)" (n<10)
+#### Docs TODO
+#### Wrap calculations and assembly into something helpful to send to other services
+rankedAbundanceApp <- function(otu, verbose=c(TRUE, FALSE)) {
 
-#   # writeMetadata(jsonList, 'abundance', verbose)
+  verbose <- plot.data::matchArg(verbose)
 
-#   print(head(dt))
-#   print(jsonList)
+  rankedAbundanceResults <- rankedAbundance(otu, verbose)
 
-#   plot.data::logWithTime("Completed abundance app.", verbose)
+  outDT <- rankedAbundanceResults$dt
+  
+  outJSON <- list(
+    'computedVariable'= names(outDT[, -c('SampleID')]),
+    'computedVariableLabels'= unname(unlist(rankedAbundanceResults$rankedTaxaList)),
+    'yAxisLabel' = jsonlite::unbox('Relative Abundance'),
+    'defaultRange' = c(0, 1),
+    'computeDetails' = jsonlite::unbox(computeMessage)
+  )
+
+  # placeholder
+  # writeDT(outDT)
+  # writeMetadata(outJSON)
+  # get file names and return something helpful
+
+  # For now
+  return(outJSON)
+
+}

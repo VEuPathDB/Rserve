@@ -1,64 +1,89 @@
-#   ## Inputs
-#   taxonomicLevel <- 'Class'
-#   k <- 2  # Keep pcoa dims
-#   method <- 'bray'
-#   verbose <- TRUE
+#### Docs TODO
+#### Beta diversity calculations 
+betaDiv <- function(otu,
+                    method = c('bray','jaccard','jsd'),
+                    k = 2,
+                    verbose = c(TRUE, FALSE)) {
 
-#   computeMessage <- ''
-  
-#   # Do argument checks
-#   # method = c('bray', 'jaccard', 'jsd')
+  # Initialize and check inputs
+  method <- plot.data::matchArg(method)
+  verbose <- plot.data::matchArg(verbose)
 
-# plot.data::logWithTime(paste("Read OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
+  computeMessage <- ''
+  plot.data::logWithTime(paste("Received OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
 
-#   # Compute beta div based on input
-#   if (identical(method, 'bray') | identical(method, 'jaccard')) {
+  # Compute beta diversity using given dissimilarity method
+  if (identical(method, 'bray') | identical(method, 'jaccard')) {
 
-#     dist <- vegan::vegdist(otu[, -c('SampleID')], method=method, binary=TRUE)
+    dist <- vegan::vegdist(otu[, -c('SampleID')], method=method, binary=TRUE)
 
-#   } else if (identical(method, 'jsd')) {
+  } else if (identical(method, 'jsd')) {
 
-#     # TO DO
+    # TO DO
 
-#   } else {
-#     stop('Unaccepted distance method. Accepted methods are bray, jaccard, and jsd.')
-#   }
-#   plot.data::logWithTime("Computed distance matrix.", verbose)
+  } else {
+    stop('Unaccepted dissimilarity method. Accepted methods are bray, jaccard, and jsd.')
+  }
+  plot.data::logWithTime("Computed dissimilarity matrix.", verbose)
 
-#   # Ordination
-#   ## Need to handle how this might err
-#   pcoa <- ape::pcoa(dist)
-#   dt <- data.table::as.data.table(pcoa$vectors)
-#   computeMessage <- paste("PCoA returned results for", NCOL(dt), "dimensions.")
-#   dt$SampleID <- otu[['SampleID']]
-#   data.table::setcolorder(dt, c('SampleID'))
-#   plot.data::logWithTime("Finished ordination step.", verbose)
+  # Ordination
+  ## Need to handle how this might err
+  pcoa <- ape::pcoa(dist)
+  dt <- data.table::as.data.table(pcoa$vectors)
+  computeMessage <- paste("PCoA returned results for", NCOL(dt), "dimensions.")
 
-#   # Extract percent variance
-#   eigenvecs <- pcoa$values$Relative_eig
-#   percentVar <- round(100*(eigenvecs / sum(eigenvecs)), 1)
+  dt$SampleID <- otu[['SampleID']]
+  data.table::setcolorder(dt, c('SampleID'))
+  plot.data::logWithTime("Finished ordination step.", verbose)
 
+  # Extract percent variance
+  eigenvecs <- pcoa$values$Relative_eig
+  percentVar <- round(100*(eigenvecs / sum(eigenvecs)), 1)
 
-#   # Keep dims 1:20?
-#   percentVar <- percentVar[1:k]
-#   # or just plug in k below. Do we want to return allllllllll columns of dt or just 20?
-  
-#   # writeDT(dt, 'betadiv', verbose) # Also keep only first k dimensions? Or does the user get them all?
-#   print(head(dt))
+  # Keep dims 1:k
+  # We should keep the same number of percentVar values as cols in the data table. However, i think we're letting the user download lots of columns? So perhaps we shouldn't have k at all? A plot can use however many it needs.
+  percentVar <- percentVar[1:k]
 
-#   # Write json metadata
-#   jsonList <- list(
-#     'computedVariable'= colnames(dt),
-#     'computedVariableLabels'= colnames(dt), # paste(colnames(dt), " ", percvar, "%")
-#     'xAxisLabel' = jsonlite::unbox(paste0(colnames(dt)[1], ", ", percentVar[1], "%")),  # paste with percvar
-#     'yAxisLabel' = jsonlite::unbox(paste0(colnames(dt)[2], ", ", percentVar[2], "%")), # paste with percvar
-#     'defaultRange' = c(0, 1), # Do we need this?
-#     'plotTitle' = jsonlite::unbox('PCoA of Beta Diversity Distances'),
-#     'pcoaVariance' = percentVar,
-#     'computeDetails' = jsonlite::unbox(computeMessage)
-#   )
+  # Perhaps this would be more clear if pcoaVar and computeDetails were attributes of dt? Worth making a class?
+  results <- list(
+    'dt' = dt,
+    'pcoaVariance' = percentVar,
+    'computeDetails' = computeMessage
+  )
 
-#   print(jsonList)
-#   #  writeMetadata(jsonList, 'betadiv', verbose)
+  plot.data::logWithTime(paste('Beta diversity calculations completed with parameters method =', method, ', k =', k, ', verbose =', verbose), verbose)
+  return(results)
+}
 
-#   plot.data::logWithTime("Completed beta diversity app.", verbose)
+#### Docs TODO
+#### Wrap calculations and assembly into something helpful to send to other services
+betaDivApp <- function(otu,
+                    method = c('bray','jaccard','jsd'),
+                    k = 2,
+                    verbose = c(TRUE, FALSE)) {
+
+  method <- plot.data::matchArg(method)
+  verbose <- plot.data::matchArg(verbose)
+
+  betaDivResults <- betaDiv(otu, method, k, verbose)
+
+  outDT <- betaDivResults$dt
+  outJSON <- list(
+    'computedVariable'= colnames(outDT),
+    'computedVariableLabels'= colnames(outDT), 
+    'xAxisLabel' = jsonlite::unbox(paste0(colnames(outDT)[2], ", ", percentVar[1], "%")),  # col 1 is sample id
+    'yAxisLabel' = jsonlite::unbox(paste0(colnames(outDT)[3], ", ", percentVar[2], "%")), 
+    'defaultRange' = c(0, 1),
+    'pcoaVariance' = betaDivResults$pcoaVariance,
+    'computeDetails' = jsonlite::unbox(betaDivResults$computeDetails)
+  )
+
+  # placeholder
+  # writeDT(outDT)
+  # writeMetadata(outJSON)
+  # get file names and return something helpful
+
+  # For now
+  return(outJSON)
+
+}
