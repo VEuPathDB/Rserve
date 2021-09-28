@@ -34,8 +34,8 @@ makeDefaultTree <- function(taxonomy_df) {
 }
 
 
-  topNTaxa <- function(df, method=c('median','max','q3','var'), cutoff=10, taxonomicLevel="Phylum") {
-    
+topNTaxa <- function(df, method=c('median','max','q3','var'), cutoff=10, taxonomicLevel="Phylum") {
+  
     ## Rank by method
     if (identical(method, 'median')) {
       ranked <- df[, list(Abundance=median(Abundance)), by=taxonomicLevel]
@@ -56,59 +56,9 @@ makeDefaultTree <- function(taxonomy_df) {
     if (NROW(topN) > cutoff) {
       topN <- topN[1:cutoff]
     }
-    
+
     return(topN)
-  }
+}
 
-  makeOTU <- function(df, taxonomicLevel) {
-
-    # Leaving as it's own function for now, in case we want to split it out in the future. See comment about two common formats.
-    df <- processTaxaDT(df)
-
-    # Reshape to OTU (samples x taxa)
-    otu <- data.table::dcast(df, as.formula(paste0("SampleID~", taxonomicLevel)), fun.aggregate = sum, value.var = 'Abundance')
-
-    # Replace NAs with 0
-    data.table::setnafill(df, fill = 0, cols = "Abundance")
-
-    ## Some sort of name check?
-
-    return(otu)
-  }
-
-  # First function that touches the data. Should clean, validate types, handle rel vs abs abundance, weird taxa names, etc.
-  processTaxaDT <- function(df) {
-
-    # Data checks (everything numeric, others?)
-
-    data.table::setDT(df)
-
-    # Clean data - rename, fill Nas with 0
-    #### Maybe this part should be a separate function of cleaning data?
-    data.table::setnames(df, c("Sample ID", "Relative Abundance", "Absolute Abundance", "Kingdom/SuperKingdom"), c("SampleID", "RelativeAbundance", "AbosluteAbundance", "Kingdom"), skip_absent = T)
-    data.table::setnafill(df, fill = 0, cols = c("RelativeAbundance", "AbosluteAbundance"))
-    
-    # Replace column N/A with unknown taxonLevel -1. 
-    fullTaxonomy <- names(df)[3:(which(names(df)==taxonomicLevel))]
-
-    invisible(lapply(fullTaxonomy, function(level){
-      print(level)
-      if (level == fullTaxonomy[1]) {
-        # If first level is NA, set to "unclassified {first level}". Ex. "unclassified Kingdom"
-        df["N/A", eval(fullTaxonomy) := paste("unclassified", level), on=level]
-      } else {
-        # If subsequent level is NA, set to "unclassified {previous level name}". Ex. "unclassified Sphingomonas"
-        levelIndex <- which(fullTaxonomy==level)
-        df["N/A", eval(fullTaxonomy[levelIndex:length(fullTaxonomy)]) := paste("unclassified", df["N/A", get(fullTaxonomy[levelIndex-1]), on=level]), on=level]
-      }
-    }))
-
-    # Aggregate by taxonomic level
-    byCols <- c(taxonomicLevel, 'SampleID')
-    df <- df[, .("Abundance" = sum(RelativeAbundance)), by = eval(byCols)]
-
-    
-    return (df)
-  }
-
+  
 print("Done loading microbiome utils functions!")
