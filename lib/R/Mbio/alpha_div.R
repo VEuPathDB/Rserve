@@ -3,10 +3,7 @@
 #   verbose <- TRUE
 
 #   computeMessage <- ''
-
-#   # Create OTU
-#   otu <- makeOTU(df, taxonomicLevel)
-#   plot.data::logWithTime(paste("Created OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
+# plot.data::logWithTime(paste("Read OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
   
 
 #   ## Actual alpha div calculations

@@ -1,6 +1,6 @@
 #   ## Inputs
 #   taxonomicLevel <- 'Class'
-#   k <- 20  # Keep pcoa dims
+#   k <- 2  # Keep pcoa dims
 #   method <- 'bray'
 #   verbose <- TRUE
 
@@ -9,9 +9,7 @@
 #   # Do argument checks
 #   # method = c('bray', 'jaccard', 'jsd')
 
-#   # Create otu table (samples x taxa)
-#   otu <- makeOTU(df, taxonomicLevel)
-#   plot.data::logWithTime(paste("Created OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
+# plot.data::logWithTime(paste("Read OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
 
 #   # Compute beta div based on input
 #   if (identical(method, 'bray') | identical(method, 'jaccard')) {

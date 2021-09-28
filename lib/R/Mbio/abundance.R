@@ -5,9 +5,7 @@
 
 #   computeMessage <- ''
 
-#   # This part seems redundant, but it's to get around using tidyr::complete (see shiny's otu_table.R line 18)
-#   otu <- makeOTU(df, taxonomicLevel)
-#   plot.data::logWithTime(paste("Created OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
+  # plot.data::logWithTime(paste("Read OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
 
 #   # Reshape back to sample, taxonomicLevel, abundance
 #   formattedDT <- data.table::melt(otu, measure.vars=colnames(otu)[-1], variable.factor=F, variable.name=taxonomicLevel, value.name="Abundance")
