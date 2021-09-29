@@ -33,10 +33,10 @@ makeDefaultTree <- function(taxonomy_df) {
     return(tree)
 }
 
-
-topNTaxa <- function(df, method=c('median','max','q3','var'), cutoff=10, taxonomicLevel="Phylum") {
-  
+topNTaxa <- function(df, method=c('median','max','q3','var'), cutoff=10, taxonomicLevel="TaxonomicLevel") {
+    
     ## Rank by method
+    #### Eventually change TaxonomicLevel -- decide if we'll ever need to actually pass this info or not.
     if (identical(method, 'median')) {
       ranked <- df[, list(Abundance=median(Abundance)), by=taxonomicLevel]
     } else if (identical(method, 'max')) {
@@ -56,9 +56,9 @@ topNTaxa <- function(df, method=c('median','max','q3','var'), cutoff=10, taxonom
     if (NROW(topN) > cutoff) {
       topN <- topN[1:cutoff]
     }
-
+    
     return(topN)
-}
-
+  }
+  
   
 print("Done loading microbiome utils functions!")
