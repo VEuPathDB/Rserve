@@ -29,8 +29,7 @@ RUN R -e "install.packages('BiocManager')"
 RUN R -e "BiocManager::install('DESeq2')"
 
 ### VEuPathDB
-RUN R echo "hi"
-RUN R -e "remotes::install_github('VEuPathDB/plot.data','documentation')"
+RUN R -e "remotes::install_github('VEuPathDB/plot.data','v1.2.3')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
