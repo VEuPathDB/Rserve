@@ -1,4 +1,4 @@
-#### Docs TODO
+  #### Docs TODO
 #### Beta diversity calculations 
 betaDiv <- function(otu,
                     method = c('bray','jaccard','jsd'),
@@ -47,14 +47,15 @@ betaDiv <- function(otu,
     # Perhaps this would be more clear if pcoaVar and computeDetails were attributes of dt? Worth making a class?
     results <- list(
       'dt' = dt,
-      'pcoaVariance' = percentVar,
-      'computeDetails' = computeMessage
+      'computedVariables' = names(dt[, -c('SampleID')]),
+      'computeName' = method,
+      'computeDetails' = computeMessage,
+      'pcoaVariance' = percentVar
     )
 
     plot.data::logWithTime(paste('Beta diversity calculations completed with parameters method =', method, ', k =', k, ', verbose =', verbose), verbose)
     return(results)
 }
-
 
 #### Docs TODO
 #### Wrap calculations and assembly into something helpful to send to other services
@@ -66,24 +67,24 @@ betaDivApp <- function(otu,
     method <- plot.data::matchArg(method)
     verbose <- plot.data::matchArg(verbose)
 
-    appResults <- betaDiv(otu, method, k, verbose)
+    computeResults <- betaDiv(otu, method, k, verbose)
 
-    outDT <- appResults$dt
-    outJSON <- list(
-      'computedVariable'= colnames(outDT),
-      'computedVariableLabels'= colnames(outDT), 
-      'computedAxisLabel' = paste(method, 'beta diversity'),
-      'defaultRange' = c(0, 1),
-      'pcoaVariance' = appResults$pcoaVariance,
-      'computeDetails' = jsonlite::unbox(appResults$computeDetails)
-    )
+    outDT <- computeResults$dt
 
+    appResults <- list("data" = computeResults$dt,
+                      "stats" = list(pcoaVariance = computeResults$pcoaVariance))
+
+    computeResults$dt <- NULL
+    computeResults$pcoaVariance <- NULL
+    appResults$metadata <- computeResults
+
+
+    # Ignoring below this line
     # placeholder
-    # writeDT(outDT)
     # writeMetadata(outJSON)
     # get file names and return something helpful
 
     # For now
-    return(outJSON)
+    return(appResults)
 
 }

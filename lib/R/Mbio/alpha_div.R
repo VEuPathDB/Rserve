@@ -12,8 +12,11 @@ alphaDiv <- function(otu, method = c('shannon','simpson','evenness'), verbose = 
 
     # Compute alpha diversity
     if (identical(method, 'shannon') | identical(method, 'simpson')){
+
       alphaDivDT <- try(vegan::diversity(otu[, -c('SampleID')], method))
+
     } else if (identical(method, 'evenness')) {
+
       alphaDivDT <- try(vegan::diversity(otu[, -c('SampleID')], 'shannon') / log(vegan::specnumber(otu)))
     }
 
@@ -24,7 +27,7 @@ alphaDiv <- function(otu, method = c('shannon','simpson','evenness'), verbose = 
       computeMessage <- paste('Computed', method, 'alpha diversity.')
     }
 
-    # Collect results
+    # Assemble data table
     dt <- data.table('SampleID'= otu[['SampleID']],
                       'alphaDiv' = alphaDivDT)
     data.table::setnames(dt, 'alphaDiv', method)
@@ -32,10 +35,11 @@ alphaDiv <- function(otu, method = c('shannon','simpson','evenness'), verbose = 
     results <- list(
       'dt' = dt,
       'computedVariables'= names(dt[, -c('SampleID')]),
-      # 'computedVariableLabels'= c('Shannon', 'Simpson', 'Pielou\'s evenness'), # add back later
+      'computedVariableLabels'= method, #### make nice later
       'computedAxisLabel' = jsonlite::unbox('Alpha Diversity'),
       'defaultRange' = c(0, 1),
-      'computeDetails' = jsonlite::unbox(computeMessage)
+      'computeDetails' = jsonlite::unbox(computeMessage),
+      'computeName' = method
     )
 
     plot.data::logWithTime(paste('Alpha diversity calculations completed with parameters method=', method, ', verbose =', verbose), verbose)
@@ -51,14 +55,25 @@ alphaDivApp <- function(otu, verbose = c(TRUE, FALSE)) {
 
     methods <- c('shannon','simpson','evenness')
 
-    appResults <- lapply(methods, alphaDiv, otu=otu, verbose=verbose)
+    computeResults <- lapply(methods, alphaDiv, otu=otu, verbose=verbose)
+
+
+    # Merge all data into one data table and remove from computeResults
+    dtList <- lapply(computeResults, function(x) return(x$dt))
+    dt <- Reduce(function(...) merge(..., all = TRUE, by='SampleID'), dtList)
+    computeResults <- lapply(computeResults, function(x) {x$dt <- NULL; return(x)})
+
+
+
+    appResults <- list("data" = dt,
+                        "stats" = NULL,
+                        "metadata" = computeResults
+    )
 
     ## Ignoring anything past here for now...
     
     # placeholder
-    # writeDT(outDT)
-    # writeMetadata(outJSON)
-    # get file names and return something helpful
+    # writeABunchOfJSON()
 
     # For now
     return(appResults)

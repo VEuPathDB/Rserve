@@ -16,9 +16,10 @@ rankedAbundance <- function(otu, method = c('median','max','q3','var'), verbose 
 
   # Extract top N taxa
   topN <- rankedTaxa[Abundance > 0, TaxonomicLevel]
+  wasCutoff <- FALSE
   if (NROW(topN) > cutoff) {
     topN <- topN[1:cutoff]
-    #### Add indication that we had to cut the list
+    wasCutoff <- TRUE
   }
 
   keepCols <- c("SampleID", topN)
@@ -27,9 +28,14 @@ rankedAbundance <- function(otu, method = c('median','max','q3','var'), verbose 
 
   # Write results
   results <- list(
-    'dt' = otu[, ..keepCols],
+    # 'dt' = otu[, ..keepCols], #### Not necessary for us because we run the app.
     'computeDetails' = computeMessage,
-    'rankedTaxa' = rankedTaxa
+    'computedVariables' = topN,
+    'computedVariableLabels' = topN,
+    'computedAxisLabel' = 'Relative Abundance',
+    'defaultRange' = c(0,1),
+    'computeName' = method,
+    'wasCutoff' = wasCutoff
   )
 
   return (results)
@@ -42,10 +48,17 @@ rankedAbundanceApp <- function(otu, verbose=c(TRUE, FALSE)) {
   verbose <- plot.data::matchArg(verbose)
 
   rankingMethods <- c('median','max','q3','var')
-  appResults <- lapply(rankingMethods, rankedAbundance, otu=otu, verbose=verbose)
+  computeResults <- lapply(rankingMethods, rankedAbundance, otu=otu, verbose=verbose)
 
-  # Merge into one large dt
-  # dt <- Reduce(function(...) merge(..., all = TRUE, by='SampleID'), dtList)
+  # Return one dt for all methods
+  keepTaxa <- unique(unlist(lapply(computeResults, function(x) return(x$computedVariables))))
+  dt <- otu[, ..keepTaxa]
+
+  appResults <- list("data" = dt,
+                      "stats" = NULL,
+                      "metadata" = computeResults
+  )
+  # mergedDT <- Reduce(function(...) merge(..., all = TRUE, by='SampleID', no.dups=F), dtList)
 
   ## Ignoring anything past here for now...
 
@@ -57,3 +70,6 @@ rankedAbundanceApp <- function(otu, verbose=c(TRUE, FALSE)) {
   return(appResults)
 
 }
+# It would be helpful to revisit the title. Does it have to have the complicated logic? Can we be more clever? 
+# Logic in the front end could just be about if there are fewer than 10 returned and the ranking method selected?
+# So then for median, the two title options would be "Top 10 taxa ranked by median" (n>=10) and "Top taxa ranked by median (taxa with median=0 not shown)" (n<10)
