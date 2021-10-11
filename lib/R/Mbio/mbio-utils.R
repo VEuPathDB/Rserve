@@ -33,32 +33,30 @@ makeDefaultTree <- function(taxonomy_df) {
     return(tree)
 }
 
-topNTaxa <- function(df, method=c('median','max','q3','var'), cutoff=10, taxonomicLevel="TaxonomicLevel") {
+rankTaxa <- function(df, method=c('median','max','q3','var')) {
+
+    method <- plot.data::matchArg(method)
+    #### Notes: Assume df has rows as samples and at least columns Abundance and TaxonomicLevel
     
     ## Rank by method
-    #### Eventually change TaxonomicLevel -- decide if we'll ever need to actually pass this info or not.
+    # taxonomicLevel <- "TaxonomicLevel" 
+
     if (identical(method, 'median')) {
-      ranked <- df[, list(Abundance=median(Abundance)), by=taxonomicLevel]
+      ranked <- df[, list(Abundance=median(Abundance)), by="TaxonomicLevel"]
     } else if (identical(method, 'max')) {
-      ranked <- df[, list(Abundance=max(Abundance)), by=taxonomicLevel]
+      ranked <- df[, list(Abundance=max(Abundance)), by="TaxonomicLevel"]
     } else if (identical(method, 'q3')) {
-      ranked <- df[, list(Abundance=quantile(Abundance, 0.75)), by=taxonomicLevel]
+      ranked <- df[, list(Abundance=quantile(Abundance, 0.75)), by="TaxonomicLevel"]
     } else if (identical(method, 'var')) {
-      ranked <- df[, list(Abundance=var(Abundance)), by=taxonomicLevel]
+      ranked <- df[, list(Abundance=var(Abundance)), by="TaxonomicLevel"]
     } else {
       stop("Unsupported ranking method.")
     }
 
-    data.table::setorderv(ranked, c("Abundance", taxonomicLevel), c(-1, 1))
-
-    # Extract top N taxa
-    topN <- ranked[Abundance > 0, ..taxonomicLevel]
-    if (NROW(topN) > cutoff) {
-      topN <- topN[1:cutoff]
-    }
+    data.table::setorderv(ranked, c("Abundance", "TaxonomicLevel"), c(-1, 1))
     
-    return(topN)
-  }
+    return(ranked)
+}
   
   
 print("Done loading microbiome utils functions!")

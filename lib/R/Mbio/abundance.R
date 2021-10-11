@@ -1,50 +1,59 @@
 #### Docs TODO
 #### Rank abundance data
-rankedAbundance <- function(otu, method = c('median','max','q3','var'), verbose = c(TRUE, FALSE)) {
+rankedAbundance <- function(otu, method = c('median','max','q3','var'), verbose = c(TRUE, FALSE), cutoff=10) {
 
-    # Initialize and check inputs
-    verbose <- plot.data::matchArg(verbose)
+  # Initialize and check inputs
+  method <- plot.data::matchArg(method)
+  verbose <- plot.data::matchArg(verbose)
 
-    computeMessage <- ''
-    plot.data::logWithTime(paste("Received OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
+  computeMessage <- ''
+  plot.data::logWithTime(paste("Received OTU table with", NROW(otu), "samples and", (NCOL(otu)-1), "taxa."), verbose)
 
-    # Reshape back to sample, taxonomicLevel, abundance
-    formattedDT <- data.table::melt(otu, measure.vars=colnames(otu)[-1], variable.factor=F, variable.name='TaxonomicLevel', value.name="Abundance")
+  # Reshape back to sample, taxonomicLevel, abundance
+  formattedDT <- data.table::melt(otu, measure.vars=colnames(otu)[-1], variable.factor=F, variable.name='TaxonomicLevel', value.name="Abundance")
 
-    # Rank taxa based on specified method
-    rankedTaxa <- topNTaxa(formattedDT, method, cutoff=10)
-    plot.data::logWithTime("Finished ranking taxa", verbose)
+  rankedTaxa <- rankTaxa(formattedDT, method)
 
+  # Extract top N taxa
+  topN <- rankedTaxa[Abundance > 0, TaxonomicLevel]
+  if (NROW(topN) > cutoff) {
+    topN <- topN[1:cutoff]
+    #### Add indication that we had to cut the list
+  }
 
-    # Collect results
-    keepCols <- c("SampleID", rankedTaxa$TaxonomicLevel)
+  keepCols <- c("SampleID", topN)
 
-    results <- list(
-      'dt' = otu[, ..keepCols],
-      'computeDetails' = computeMessage,
-      'rankedTaxa' = rankedTaxa
-    )
+  plot.data::logWithTime("Finished ranking taxa", verbose)
 
-    return (results)
+  # Write results
+  results <- list(
+    'dt' = otu[, ..keepCols],
+    'computeDetails' = computeMessage,
+    'rankedTaxa' = rankedTaxa
+  )
+
+  return (results)
 }
 
 #### Docs TODO
 #### Wrap calculations and assembly into something helpful to send to other services
 rankedAbundanceApp <- function(otu, verbose=c(TRUE, FALSE)) {
 
-    verbose <- plot.data::matchArg(verbose)
+  verbose <- plot.data::matchArg(verbose)
 
-    rankingMethods <- c('median','max','q3','var')
-    appResults <- lapply(rankingMethods, rankedAbundance, otu=otu, verbose=verbose)
+  rankingMethods <- c('median','max','q3','var')
+  appResults <- lapply(rankingMethods, rankedAbundance, otu=otu, verbose=verbose)
 
-    ## Ignoring anything past here for now...
+  # Merge into one large dt
+  # dt <- Reduce(function(...) merge(..., all = TRUE, by='SampleID'), dtList)
 
-    # placeholder
-    # writeDT(outDT)
-    # writeMetadata(outJSON)
-    # get file names and return something helpful
+  ## Ignoring anything past here for now...
 
-    # For now
-    return(appResults)
+  # placeholder
+  # writeAllThatJSON()
+  # get file names and return something helpful
+
+  # For now
+  return(appResults)
 
 }
