@@ -18,8 +18,9 @@ betaDiv <- function(otu,
       dist <- vegan::vegdist(otu[, -c('SampleID')], method=method, binary=TRUE)
 
     } else if (identical(method, 'jsd')) {
-
-      # TO DO
+      otuMat <- matrix(as.numeric(unlist(otu[, -c("SampleID")])), nrow=NROW(otu))
+      dist <- jsdphyloseq(t(otuMat))
+      dist <- as.dist(dist)
 
     } else {
       stop('Unaccepted dissimilarity method. Accepted methods are bray, jaccard, and jsd.')
@@ -28,7 +29,7 @@ betaDiv <- function(otu,
 
     # Ordination
     ## Need to handle how this might err
-    pcoa <- ape::pcoa(dist)
+    pcoa <- PCOA(dist)
     dt <- data.table::as.data.table(pcoa$vectors)
     computeMessage <- paste("PCoA returned results for", NCOL(dt), "dimensions.")
 
