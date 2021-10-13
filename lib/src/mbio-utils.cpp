@@ -2,22 +2,32 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix jsdphyloseq(Rcpp::NumericMatrix df) {
+Rcpp::NumericMatrix jsd(Rcpp::NumericMatrix df) {
   int ncol = df.ncol();
-  Rcpp::NumericMatrix result(ncol, ncol);
+  Rcpp::NumericMatrix dissimilarityMat(ncol, ncol);
+
+  Rcpp::NumericMatrix logp2 = Rcpp::colSums(df * Rcpp::log(2 * df));
+  
   for (int i = 0; i < ncol; i++) {
+    Rcpp::NumericVector p = df(Rcpp::_, i);
+
+    Rcpp::NumericVector log2p = Rcpp::log(2 * p);
+    log2p[!Rcpp::is_finite(log2p)] = 0;
+
+    double pterm = Rcpp::sum(p * log2p);
+
     for (int j=0; j<= i; j++) {
-      Rcpp::NumericVector p = df(Rcpp::_, i);
       Rcpp::NumericVector q = df(Rcpp::_, j);
-      Rcpp::NumericVector m = (p+q)/2;
+      
+      Rcpp::NumericVector log2q = Rcpp::log(2 * q);
+      log2q[!Rcpp::is_finite(log2q)] = 0;
 
-      Rcpp::NumericVector t1 = p*Rcpp::log(p/m);
-      t1[!Rcpp::is_finite(t1)] = 0;
-      Rcpp::NumericVector t2 = q*Rcpp::log(q/m);
-      t2[!Rcpp::is_finite(t2)] = 0;
+      Rcpp::NumericVector logpq = Rcpp::log(p+q);
+      logpq[!Rcpp::is_finite(logpq)] = 0;
 
-      result(i,j) = Rcpp::sum(t1+t2)/2;
+      dissimilarityMat(i,j) = pterm - Rcpp::sum(p * logpq) + Rcpp::sum(q * log2q) - Rcpp::sum(q * logpq);
+      dissimilarityMat(j,i) = dissimilarityMat(i,j);
     }
   }
-  return result;
-}
+  dissimilarityMat = dissimilarityMat/2;
+  return dissimilarityMat;

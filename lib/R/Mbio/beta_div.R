@@ -19,7 +19,7 @@ betaDiv <- function(otu,
 
     } else if (identical(method, 'jsd')) {
       otuMat <- matrix(as.numeric(unlist(otu[, -c("SampleID")])), nrow=NROW(otu))
-      dist <- jsdphyloseq(t(otuMat))
+      dist <- jsd(t(otuMat))
       dist <- as.dist(dist)
 
     } else {
