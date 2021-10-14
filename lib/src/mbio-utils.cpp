@@ -4,9 +4,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 Rcpp::NumericMatrix jsd(Rcpp::NumericMatrix df) {
   int ncol = df.ncol();
-  Rcpp::NumericMatrix dissimilarityMat(ncol, ncol);
-
-  Rcpp::NumericMatrix logp2 = Rcpp::colSums(df * Rcpp::log(2 * df));
+  Rcpp::NumericMatrix disimilarityMat(ncol, ncol);
   
   for (int i = 0; i < ncol; i++) {
     Rcpp::NumericVector p = df(Rcpp::_, i);
@@ -25,9 +23,10 @@ Rcpp::NumericMatrix jsd(Rcpp::NumericMatrix df) {
       Rcpp::NumericVector logpq = Rcpp::log(p+q);
       logpq[!Rcpp::is_finite(logpq)] = 0;
 
-      dissimilarityMat(i,j) = pterm - Rcpp::sum(p * logpq) + Rcpp::sum(q * log2q) - Rcpp::sum(q * logpq);
-      dissimilarityMat(j,i) = dissimilarityMat(i,j);
+
+      disimilarityMat(i,j) = pterm - Rcpp::sum(p * logpq) + Rcpp::sum(q * log2q) - Rcpp::sum(q * logpq);
+      disimilarityMat(j,i) = disimilarityMat(i,j);
     }
   }
-  dissimilarityMat = dissimilarityMat/2;
-  return dissimilarityMat;
+  disimilarityMat = disimilarityMat/2;
+  return disimilarityMat;
