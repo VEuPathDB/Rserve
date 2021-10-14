@@ -24,6 +24,7 @@ RUN R -e "install.packages('rbiom')"
 RUN R -e "install.packages('remotes')"
 RUN R -e "install.packages('vegan')"
 RUN R -e "install.packages('Rcpp')"
+RUN R -e "install.packages('stringr')"
 
 ### Bioconductor
 RUN R -e "install.packages('BiocManager')"

@@ -1,4 +1,4 @@
-  #### Docs TODO
+#### Docs TODO
 #### Beta diversity calculations 
 betaDiv <- function(otu,
                     method = c('bray','jaccard','jsd'),
@@ -49,8 +49,8 @@ betaDiv <- function(otu,
     results <- list(
       'dt' = dt,
       'computedVariables' = names(dt[, -c('SampleID')]),
-      'computeName' = method,
-      'computeDetails' = computeMessage,
+      'computeName' = jsonlite::unbox(method),
+      'computeDetails' = jsonlite::unbox(computeMessage),
       'pcoaVariance' = percentVar
     )
 
@@ -80,12 +80,8 @@ betaDivApp <- function(otu,
     appResults$metadata <- computeResults
 
 
-    # Ignoring below this line
-    # placeholder
-    # writeMetadata(outJSON)
-    # get file names and return something helpful
-
-    # For now
-    return(appResults)
+    # Write to json
+    outFileName <- writeListToJson(appResults, 'BetaDiv')
+    return(outFileName)
 
 }

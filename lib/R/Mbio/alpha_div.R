@@ -14,10 +14,12 @@ alphaDiv <- function(otu, method = c('shannon','simpson','evenness'), verbose = 
     if (identical(method, 'shannon') | identical(method, 'simpson')){
 
       alphaDivDT <- try(vegan::diversity(otu[, -c('SampleID')], method))
+      computedVarLabel <- stringr::str_to_title(method)
 
     } else if (identical(method, 'evenness')) {
 
       alphaDivDT <- try(vegan::diversity(otu[, -c('SampleID')], 'shannon') / log(vegan::specnumber(otu)))
+      computedVarLabel <- "Pielou\'s Evenness"
     }
 
     if (is.error(alphaDivDT)) {
@@ -35,11 +37,11 @@ alphaDiv <- function(otu, method = c('shannon','simpson','evenness'), verbose = 
     results <- list(
       'dt' = dt,
       'computedVariables'= names(dt[, -c('SampleID')]),
-      'computedVariableLabels'= method, #### make nice later
+      'computedVariableLabels'= computedVarLabel,
       'computedAxisLabel' = jsonlite::unbox('Alpha Diversity'),
       'defaultRange' = c(0, 1),
       'computeDetails' = jsonlite::unbox(computeMessage),
-      'computeName' = method
+      'computeName' = jsonlite::unbox(method)
     )
 
     plot.data::logWithTime(paste('Alpha diversity calculations completed with parameters method=', method, ', verbose =', verbose), verbose)
@@ -70,11 +72,7 @@ alphaDivApp <- function(otu, verbose = c(TRUE, FALSE)) {
                         "metadata" = computeResults
     )
 
-    ## Ignoring anything past here for now...
-    
-    # placeholder
-    # writeABunchOfJSON()
-
-    # For now
-    return(appResults)
+    # Write to json
+    outFileName <- writeListToJson(appResults, 'AlphaDiv')
+    return(outFileName)
 }

@@ -1,36 +1,17 @@
 ## General helper functions
 
 
-  # Write to file - will need to be a helper function
-  # writeDT <- function(dt, pattern=NULL, verbose=c(TRUE, FALSE)) {
-  #   outFileName <- basename(tempfile(pattern = pattern, tmpdir = tempdir(), fileext = ".tab"))
-  #   data.table::fwrite(dt, outFileName)
+# Write a list to json file
+writeListToJson <- function(jsonList, pattern = NULL, dir = NULL, verbose = c(TRUE, FALSE)) {
+    verbose <- matchArg(verbose)
 
-  #   plot.data::logWithTime(paste('New computation file written:', outFileName), verbose)
-  #   return(outFileName)
-  # }
+    if (is.null(pattern)) pattern <- 'file'
+    if (is.null(dir)) dir <- tempdir()
 
+    outJson <- jsonlite::toJSON(jsonList)
+    outFileName <- basename(tempfile(pattern = pattern, tmpdir = dir, fileext = ".json"))
+    write(outJson, outFileName)
+    plot.data::logWithTime(paste('New json file written:', outFileName), verbose)
 
-  # Write to json ()
-#   writeMetaData <- function(metaData, pattern, verbose) {
-#     outJson <- jsonlite::toJSON(metaData)
-#     if (is.null(pattern)) { 
-#       pattern <- 'metadata'
-#     }
-#     outFileName <- basename(tempfile(pattern = pattern, tmpdir = tempdir(), fileext = ".json"))
-#     write(outJson, outFileName)
-#     plot.data::logWithTime(paste('New metadata file written:', outFileName), verbose)
-#   }
-
-# Parsing args? Each app will have it's own list of args. Args come in via string or some other weirdness sometimes.
-# May become something else later, but at least this can serve as a reminder.
-  # Current compute config to parse?
-  # ComputeConfig:
-  #       type: object
-  #       additionalProperties: false
-  #       properties:
-  #         name: string
-  #         parameters:
-  #           required: false
-  #           type: string[]
-  
+    return(outFileName)
+}

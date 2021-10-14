@@ -30,3 +30,4 @@ Rcpp::NumericMatrix jsd(Rcpp::NumericMatrix df) {
   }
   disimilarityMat = disimilarityMat/2;
   return disimilarityMat;
+}
