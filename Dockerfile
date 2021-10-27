@@ -24,7 +24,7 @@ RUN R -e "install.packages('rbiom')"
 RUN R -e "install.packages('remotes')"
 RUN R -e "install.packages('vegan')"
 RUN R -e "install.packages('Rcpp')"
-RUN R -e "install.packages('stringr')"
+RUN R -e "install.packages('stringi')"
 
 ### Bioconductor
 RUN R -e "install.packages('BiocManager')"
@@ -32,6 +32,7 @@ RUN R -e "BiocManager::install('DESeq2')"
 
 ### VEuPathDB
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v1.2.3')"
+RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
