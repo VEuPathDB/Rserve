@@ -7,6 +7,7 @@ library(DESeq2)
 library(Rcpp)
 ## NOTE: attach our in house packages last
 library(plot.data)
+library(veupathUtils)
 library(microbiomeComputations)
 
 files.sources <- list.files('opt/rserve/lib/R/', full.names=TRUE, recursive=TRUE)
