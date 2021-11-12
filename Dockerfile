@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 
 ## install libs
 ### Rserve
-RUN R -e "install.packages('Rserve', version='1.8-7', repos='http://rforge.net')"
+RUN R -e "install.packages('Rserve', version='1.8-9', repos='http://rforge.net')"
 
 ### CRAN
 RUN R -e "install.packages('ape')"
