@@ -15,25 +15,17 @@ RUN apt-get update && apt-get install -y \
 RUN R -e "install.packages('Rserve', version='1.8-7', repos='http://rforge.net')"
 
 ### CRAN
-RUN R -e "install.packages('ape')"
 RUN R -e "install.packages('bit64')"
 RUN R -e "install.packages('data.table')"
 RUN R -e "install.packages('jsonlite')"
-RUN R -e "install.packages('phytools')"
-RUN R -e "install.packages('rbiom')"
 RUN R -e "install.packages('remotes')"
-RUN R -e "install.packages('vegan')"
 RUN R -e "install.packages('Rcpp')"
-RUN R -e "install.packages('stringi')"
-
-### Bioconductor
-RUN R -e "install.packages('BiocManager')"
-RUN R -e "BiocManager::install('DESeq2')"
 
 ### VEuPathDB
+RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v1.0.0')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v1.2.3')"
 RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations')"
-RUN R -e "remotes::install_github('VEuPathDB/veupathUtils')"
+
 
 ## Rserve
 RUN mkdir -p /opt/rserve
