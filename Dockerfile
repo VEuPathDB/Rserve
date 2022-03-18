@@ -21,9 +21,9 @@ RUN R -e "install.packages('jsonlite')"
 RUN R -e "install.packages('remotes')"
 RUN R -e "install.packages('Rcpp')"
 
-RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v1.0.0')"
-RUN R -e "remotes::install_github('VEuPathDB/plot.data','v1.4.13')"
-RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v1.0.0')"
+RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v1.0.1')"
+RUN R -e "remotes::install_github('VEuPathDB/plot.data','v1.5.0')"
+RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v1.0.2')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
