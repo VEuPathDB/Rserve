@@ -20,6 +20,7 @@ RUN R -e "install.packages('data.table')"
 RUN R -e "install.packages('jsonlite')"
 RUN R -e "install.packages('remotes')"
 RUN R -e "install.packages('Rcpp')"
+RUN R -e "install.packages('devtools')"
 
 RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v1.0.1')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v3.1.2')"
@@ -34,8 +35,10 @@ RUN mkdir ${RSERVE_HOME}/lib
 COPY lib/ ${RSERVE_HOME}/lib/
 
 RUN mkdir ${RSERVE_HOME}/work
+COPY ./runLocalPD.R ${RSERVE_HOME}/work
 
 EXPOSE 6311
 
-ENV DEBUG FALSE
-CMD R -e "Rserve::Rserve(debug = "${DEBUG}", args=\"--vanilla\")"
+#ENV DEBUG FALSE
+#CMD R -e "Rserve::Rserve(debug = "${DEBUG}", args=\"--vanilla\")"
+CMD Rscript ${RSERVE_HOME}/work/runLocalPD.R
