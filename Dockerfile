@@ -20,6 +20,7 @@ RUN R -e "install.packages('data.table')"
 RUN R -e "install.packages('jsonlite')"
 RUN R -e "install.packages('remotes')"
 RUN R -e "install.packages('Rcpp')"
+RUN R -e "install.packages('readr')"
 
 RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v1.0.1')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v3.1.8')"
