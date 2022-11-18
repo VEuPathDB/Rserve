@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.0.4
+FROM rocker/r-ver:4.2.2
 
 ## Set a default user. Available via runtime flag `--user rserve`
 ## User should also have & own a home directory (for rstudio or linked volumes to work properly).
@@ -22,9 +22,9 @@ RUN R -e "install.packages('remotes')"
 RUN R -e "install.packages('Rcpp')"
 RUN R -e "install.packages('readr')"
 
-RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v1.0.1')"
-RUN R -e "remotes::install_github('VEuPathDB/plot.data','v3.1.8')"
-RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v1.1.0')"
+RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.0.0')"
+RUN R -e "remotes::install_github('VEuPathDB/plot.data','v4.0.1')"
+RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v1.2.0')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
