@@ -24,7 +24,7 @@ RUN R -e "install.packages('readr')"
 
 RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.2.3')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v5.0.2')"
-RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v2.0.2')"
+RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v2.1.0')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
