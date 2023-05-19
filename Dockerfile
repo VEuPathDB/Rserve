@@ -22,6 +22,11 @@ RUN R -e "install.packages('remotes')"
 RUN R -e "install.packages('Rcpp')"
 RUN R -e "install.packages('readr')"
 
+### Bioconductor
+RUN R -e "install.packages('BiocManager')"
+RUN R -e "BiocManager::install('SummarizedExperiment')"
+RUN R -e "BiocManager::install('DESeq2')"
+
 RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.2.4')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v5.0.2')"
 RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v2.1.0')"
