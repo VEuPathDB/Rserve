@@ -29,7 +29,7 @@ RUN R -e "BiocManager::install('DESeq2')"
 
 RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.2.4')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v5.0.2')"
-RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v2.1.0')"
+RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v2.1.1')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
