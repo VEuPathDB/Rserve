@@ -28,10 +28,11 @@ RUN R -e "install.packages('digest')"
 RUN R -e "install.packages('BiocManager')"
 RUN R -e "BiocManager::install('SummarizedExperiment')"
 RUN R -e "BiocManager::install('DESeq2')"
+RUN R -e "BiocManager::install('Maaslin2')"
 
 RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.3.3')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v5.0.2')"
-RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v3.0.2')"
+RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v3.1.2')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
