@@ -30,9 +30,10 @@ RUN R -e "BiocManager::install('SummarizedExperiment')"
 RUN R -e "BiocManager::install('DESeq2')"
 RUN R -e "BiocManager::install('Maaslin2')"
 
+RUN R -e "print('hi ann3')"
 RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.3.5')"
-RUN R -e "remotes::install_github('VEuPathDB/plot.data','v5.0.2')"
-RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'feature-33-correlation')"
+RUN R -e "remotes::install_github('VEuPathDB/plot.data','feature-229-add-network')"
+RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'update-tojson-correlationResult')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
