@@ -32,7 +32,7 @@ RUN R -e "BiocManager::install('Maaslin2')"
 
 RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.3.9')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data','v5.1.1')"
-RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v3.3.5')"
+RUN R -e "remotes::install_github('VEuPathDB/microbiomeComputations', 'v3.3.7')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
