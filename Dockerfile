@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.2.2
+FROM rocker/r-ver:4.3.2
 
 ## Set a default user. Available via runtime flag `--user rserve`
 ## User should also have & own a home directory (for rstudio or linked volumes to work properly).
