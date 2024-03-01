@@ -30,9 +30,12 @@ RUN R -e "BiocManager::install('SummarizedExperiment')"
 RUN R -e "BiocManager::install('DESeq2')"
 RUN R -e "BiocManager::install('Maaslin2')"
 
-RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.4.0')"
+### explicitly versioning spieceasi to something i know works.
+RUN R -e "remotes::install_github('zdk123/SpiecEasi','v1.1.1')" 
+
+RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.5.2')"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data', 'v5.3.0')"
-RUN R -e "remotes::install_github('microbiomeDB/microbiomeComputations', 'v3.3.9')"
+RUN R -e "remotes::install_github('microbiomeDB/microbiomeComputations', 'v4.0.2')"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
