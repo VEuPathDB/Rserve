@@ -33,7 +33,7 @@ RUN R -e "BiocManager::install('Maaslin2')"
 ### explicitly versioning spieceasi to something i know works.
 RUN R -e "remotes::install_github('zdk123/SpiecEasi','v1.1.1', upgrade_dependencies=F)" 
 
-RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.6.1', upgrade_dependencies=F)"
+RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.6.3', upgrade_dependencies=F)"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data', 'v5.3.1', upgrade_dependencies=F)"
 RUN R -e "remotes::install_github('microbiomeDB/microbiomeComputations', 'v5.1.0', upgrade_dependencies=F)"
 
