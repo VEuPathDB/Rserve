@@ -8,7 +8,8 @@ RUN useradd rserve \
 
 RUN apt-get update && apt-get install -y \
 	libglpk-dev \
-	libxml2-dev
+	libxml2-dev \
+	&& rm -rf /var/lib/apt/lists/*
 
 ## install libs
 ### Rserve
