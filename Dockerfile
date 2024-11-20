@@ -23,6 +23,7 @@ RUN R -e "install.packages('remotes')"
 RUN R -e "install.packages('Rcpp')"
 RUN R -e "install.packages('readr')"
 RUN R -e "install.packages('digest')"
+RUN R -e "install.packages('Hmisc')"
 
 ### Bioconductor
 RUN R -e "install.packages('BiocManager')"
