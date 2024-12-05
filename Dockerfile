@@ -33,7 +33,7 @@ RUN R -e "BiocManager::install('Maaslin2')"
 
 RUN R -e "remotes::install_github('zdk123/SpiecEasi','v1.1.1', upgrade_dependencies=F)" 
 
-RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.6.8', upgrade_dependencies=F)"
+RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.7.0', upgrade_dependencies=F)"
 RUN R -e "remotes::install_github('VEuPathDB/plot.data', 'v5.4.2', upgrade_dependencies=F)"
 RUN R -e "remotes::install_github('microbiomeDB/microbiomeComputations', 'v5.1.3', upgrade_dependencies=F)"
 
