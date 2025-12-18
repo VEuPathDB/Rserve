@@ -25,17 +25,23 @@ RUN R -e "install.packages('readr')"
 RUN R -e "install.packages('digest')"
 RUN R -e "install.packages('Hmisc')"
 
-### Bioconductor
+# BioConductor - one still needed until microbiomeDB/microbiomeComputations@v5.1.6.x installs it automatically
+# see https://github.com/microbiomeDB/microbiomeComputations/issues/35
 RUN R -e "install.packages('BiocManager')"
-RUN R -e "BiocManager::install('SummarizedExperiment')"
-RUN R -e "BiocManager::install('DESeq2')"
 RUN R -e "BiocManager::install('Maaslin2')"
 
-RUN R -e "remotes::install_github('zdk123/SpiecEasi','v1.1.1', upgrade_dependencies=F)" 
+RUN R -e "remotes::install_github('VEuPathDB/plot.data', 'v5.6.0', dependencies=TRUE, upgrade_dependencies=FALSE)"
 
-RUN R -e "remotes::install_github('VEuPathDB/veupathUtils', 'v2.8.0', upgrade_dependencies=F)"
-RUN R -e "remotes::install_github('VEuPathDB/plot.data', 'v5.4.4', upgrade_dependencies=F)"
-RUN R -e "remotes::install_github('microbiomeDB/microbiomeComputations', 'v5.1.6', upgrade_dependencies=F)"
+# microbiomeDB/microbiomeComputations@v5.1.6 installs `VEuPathDB/veupathUtils` which in turn installs SpiecEasi@v1.0.7 (see below)
+#
+# Note that microbiomeDB/microbiomeComputations@v5.1.7 is a whole new ball game and installs mbioUtils.
+# mbioUtils shares too many functions with veupathUtils to import both - unless everything is fully qualified e.g. mbioUtils::some_function()
+#
+# plot.data@v5.6.0 also installs veupathUtils as a dependency which in turn installs
+# - SummarizedExperiment
+# - DESeq2
+# - zdk123/SpiecEasi@v1.0.
+RUN R -e "remotes::install_github('microbiomeDB/microbiomeComputations', 'v5.1.6', dependencies=TRUE, upgrade_dependencies=FALSE)"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
