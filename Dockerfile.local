@@ -1,0 +1,77 @@
+## Local development build - uses ../veupathUtils, ../plot.data, ../microbiomeComputations
+## instead of fetching from GitHub.
+##
+## Build from the parent EDA/ directory (so all three source trees are in the build context):
+##
+##   docker build -f Rserve/Dockerfile.local -t rserve-local .
+##
+## Key mechanism: veupathUtils is installed first from local source.
+## plot.data and microbiomeComputations are then installed with upgrade='never',
+## which causes remotes to skip the 'Remotes: VEuPathDB/veupathUtils@v2.12.7'
+## entry in their DESCRIPTION files (package already present → don't reinstall).
+
+FROM rocker/r-ver:4.4.2
+
+ARG GITHUB_PAT=""
+
+RUN useradd rserve \
+	&& mkdir /home/rserve \
+	&& chown rserve:rserve /home/rserve
+
+RUN apt-get update && apt-get install -y \
+	libglpk-dev \
+	libxml2-dev \
+	git
+
+## Workaround for S4Vectors compilation on Ubuntu 24.04 / gcc 13.3.0
+RUN mkdir -p /root/.R && \
+    echo "CFLAGS = -g -O2 -fstack-protector-strong -Wformat -Wdate-time -D_FORTIFY_SOURCE=2" > /root/.R/Makevars
+
+## install libs
+### Rserve
+RUN R -e "install.packages('Rserve', version='1.8-9', repos='http://rforge.net')"
+
+### CRAN
+RUN R -e "install.packages('bit64')"
+RUN R -e "install.packages('data.table')"
+RUN R -e "install.packages('dplyr')"
+RUN R -e "install.packages('jsonlite')"
+RUN R -e "install.packages('remotes')"
+RUN R -e "install.packages('Rcpp')"
+RUN R -e "install.packages('readr')"
+RUN R -e "install.packages('digest')"
+RUN R -e "install.packages('Hmisc')"
+
+ENV GITHUB_PAT=$GITHUB_PAT
+
+## Copy local package sources (paths relative to EDA/ build context)
+COPY veupathUtils/ /tmp/veupathUtils/
+COPY plot.data/ /tmp/plot.data/
+COPY microbiomeComputations/ /tmp/microbiomeComputations/
+
+## 1. Install veupathUtils from local source (fetches its Bioc/GitHub deps normally)
+RUN R -e "remotes::install_local('/tmp/veupathUtils', dependencies=TRUE, upgrade='never')"
+
+## 2. Install plot.data from local source.
+##    upgrade='never' prevents remotes from re-fetching veupathUtils from GitHub
+##    (it's already installed from step 1).
+RUN R -e "remotes::install_local('/tmp/plot.data', dependencies=TRUE, upgrade='never')"
+
+## 3. Install microbiomeComputations from local source.
+##    Same upgrade='never' logic applies for veupathUtils.
+RUN R -e "remotes::install_local('/tmp/microbiomeComputations', dependencies=TRUE, upgrade='never')"
+
+## Rserve
+RUN mkdir -p /opt/rserve
+ENV RSERVE_HOME=/opt/rserve
+
+COPY Rserve/etc/Rserv.conf /etc/Rserv.conf
+RUN mkdir ${RSERVE_HOME}/lib
+COPY Rserve/lib/ ${RSERVE_HOME}/lib/
+
+RUN mkdir ${RSERVE_HOME}/work
+
+EXPOSE 6311
+
+ENV DEBUG=FALSE
+CMD R -e "Rserve::Rserve(debug = "${DEBUG}", args=\"--vanilla\")"

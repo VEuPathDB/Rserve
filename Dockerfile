@@ -44,7 +44,7 @@ RUN R -e "install.packages('Hmisc')"
 ## Set GITHUB_PAT for remotes package to avoid rate limits
 ENV GITHUB_PAT=$GITHUB_PAT
 
-RUN R -e "remotes::install_github('VEuPathDB/plot.data', 'v5.6.13', dependencies=TRUE, upgrade_dependencies=FALSE)"
+RUN R -e "remotes::install_github('VEuPathDB/plot.data', 'v5.6.14', dependencies=TRUE, upgrade_dependencies=FALSE)"
 
 # microbiomeDB/microbiomeComputations@v5.1.6.x installs Maaslin2 and `VEuPathDB/veupathUtils`
 # which in turn installs SpiecEasi@v1.0.7 and more (see below)
@@ -56,7 +56,7 @@ RUN R -e "remotes::install_github('VEuPathDB/plot.data', 'v5.6.13', dependencies
 # - SummarizedExperiment
 # - DESeq2
 # - zdk123/SpiecEasi@v1.0.7
-RUN R -e "remotes::install_github('microbiomeDB/microbiomeComputations', 'v5.1.6.9', dependencies=TRUE, upgrade_dependencies=FALSE)"
+RUN R -e "remotes::install_github('microbiomeDB/microbiomeComputations', 'v5.1.6.10', dependencies=TRUE, upgrade_dependencies=FALSE)"
 
 ## Rserve
 RUN mkdir -p /opt/rserve
